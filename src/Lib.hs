@@ -1,5 +1,8 @@
 module Lib
-    ( addBlock
+    ( 
+        addBlock,
+        isBlockValid,
+        Block
     ) where
 
 import Data.Time.Clock
@@ -22,9 +25,14 @@ addBlock blocks@(x:xs) value timestamp = blocks ++ [(Block newHash prevHash valu
     where
         prevHash = currentHash $ last blocks
         newHash = hashBlockData prevHash value timestamp
-addBlock [] value timestamp = [] ++ [(Block newHash 0 value timestamp)]
+addBlock [] value timestamp = [] ++ [(Block newHash initialHash value timestamp)]
     where
-        newHash = hashBlockData 0 value timestamp
+        initialHash = 0
+        newHash = hashBlockData initialHash value timestamp
 
+isBlockValid :: Block -> Block -> Bool
+isBlockValid prevBlock nextBlock = (prevHash nextBlock) == (currentHash prevBlock)
+
+-- Use the prev hash, value and timestamp to create a hash for the current block 
 hashBlockData :: Int -> String -> UTCTime -> Int
 hashBlockData prevHash value timestamp = hash ((show prevHash) ++ value ++ (show timestamp))
